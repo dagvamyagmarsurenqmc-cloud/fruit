@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Battle: Cyber Neon</title>
+    <title>Fruit Battle: Fruit Rain Mode</title>
     <style>
         :root {
             --p1-color: #00ff88;
             --p2-color: #00d2ff;
             --gold-color: #ffd32a;
-            --orange-color: #ff9f43;
-            --bomb-color: #ff4757;
             --bg-dark: #0a0e17;
         }
 
@@ -58,37 +56,32 @@
         .basket {
             position: absolute;
             bottom: 30px;
-            height: 14px;
+            height: 16px;
             border-radius: 20px;
-            transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            transition: width 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
         }
 
         #basket1 {
-            background: var(--p1-color);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+            background: linear-gradient(90deg, #00ff88, #00b358);
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
         }
 
         #basket2 {
-            background: var(--p2-color);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+            background: linear-gradient(90deg, #00d2ff, #0086b3);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
         }
 
-        /* Унах зүйлс */
+        /* УНАХ БОДИТ ЖИМСНҮҮД */
         .falling-object {
             position: absolute;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-        }
-
-        .fruit-red { background: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); }
-        .fruit-yellow { background: var(--gold-color); box-shadow: 0 0 15px rgba(255, 211, 42, 0.6); }
-        .fruit-blue { background: #2e86de; box-shadow: 0 0 15px rgba(46, 134, 222, 0.6); }
-        .fruit-orange { background: var(--orange-color); box-shadow: 0 0 15px rgba(255, 159, 67, 0.6); }
-        .bomb { 
-            background: #3d3d3d; 
-            border: 2px solid var(--bomb-color); 
-            box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+            width: 35px;
+            height: 35px;
+            font-size: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            z-index: 2;
         }
 
         /* UI Хэсэг */
@@ -158,7 +151,6 @@
             -webkit-text-fill-color: transparent;
         }
         
-        /* Input загвар */
         .input-group { display: flex; gap: 30px; margin-bottom: 35px; }
         .input-box { display: flex; flex-direction: column; align-items: center; }
         .input-box label { font-size: 13px; color: #8af; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
@@ -169,7 +161,6 @@
         }
         .input-box input:focus { border-color: var(--p2-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); outline: none; }
 
-        /* Товчлуур */
         .btn {
             padding: 14px 45px; font-size: 16px; background: linear-gradient(135deg, #00d2ff 0%, #00ff88 100%);
             color: #0a0e17; border: none; border-radius: 12px; cursor: pointer; font-weight: 700;
@@ -178,7 +169,6 @@
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.4); }
         .btn:active { transform: translateY(-1px); }
 
-        /* Дээд амжилт */
         .leaderboard {
             margin-top: 30px; width: 340px; background: rgba(255,255,255,0.02);
             padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
@@ -261,7 +251,7 @@
         const fieldWidth = 500;
         const baseBasketWidth = 90;
         const largeBasketWidth = 140;
-        const basketSpeed = 12;
+        const basketSpeed = 14; // Сагсны хурдыг бага зэрэг нэмэв (Олон жимс ирэх тул)
 
         let p1Score = 0;
         let p2Score = 0;
@@ -282,6 +272,14 @@
         let isGameOver = false;
 
         let keys = { a: false, d: false, ArrowLeft: false, ArrowRight: false };
+
+        const fruitTypes = {
+            apple: '🍎',
+            banana: '🍌',
+            grapes: '🍇',
+            orange: '🍊',
+            bomb: '💣'
+        };
 
         document.addEventListener('keydown', (e) => {
             let key = e.key;
@@ -316,35 +314,46 @@
             resetGame();
         }
 
+        // ШИНЭЧЛЭГДСЭН: Олноор нь үүсгэдэг функц
         function spawnManager() {
             if (isGameOver) return;
 
-            const rand = Math.random();
-            let type = 'fruit-red';
+            // Санамсаргүй байдлаар нэг удаад 1-ээс 3 жимс зэрэг үүснэ
+            const spawnCount = Math.floor(Math.random() * 3) + 1; 
 
-            if (rand < 0.45) type = 'fruit-red';       
-            else if (rand < 0.65) type = 'fruit-yellow'; 
-            else if (rand < 0.75) type = 'fruit-blue';   
-            else if (rand < 0.82) type = 'fruit-orange'; 
-            else type = 'bomb';                          
+            for (let k = 0; k < spawnCount; k++) {
+                const rand = Math.random();
+                let type = 'apple';
 
-            const xPos = Math.floor(Math.random() * (fieldWidth - 30));
+                if (rand < 0.45) type = 'apple';       
+                else if (rand < 0.65) type = 'banana'; 
+                else if (rand < 0.75) type = 'grapes';   
+                else if (rand < 0.85) type = 'orange'; // Олон жимсэн дунд бөмбөг арай багасгав
+                else type = 'bomb';                          
 
-            // Зүүн талбар
-            const obj1 = document.createElement('div');
-            obj1.classList.add('falling-object', type);
-            obj1.style.left = xPos + 'px';
-            obj1.style.top = '0px';
-            field1.appendChild(obj1);
-            objects.push({ element: obj1, x: xPos, y: 0, type: type, field: 1 });
+                // Жимснүүд давхцахгүй байх үүднээс санамсаргүй X байрлал
+                const xPos = Math.floor(Math.random() * (fieldWidth - 35));
+                // Зэрэг унахдаа яг ижил өндрөөс биш бага зэрэг зөрүүтэй унана
+                const yOffset = -Math.floor(Math.random() * 40); 
 
-            // Баруун талбар
-            const obj2 = document.createElement('div');
-            obj2.classList.add('falling-object', type);
-            obj2.style.left = xPos + 'px';
-            obj2.style.top = '0px';
-            field2.appendChild(obj2);
-            objects.push({ element: obj2, x: xPos, y: 0, type: type, field: 2 });
+                // Зүүн талбар
+                const obj1 = document.createElement('div');
+                obj1.classList.add('falling-object');
+                obj1.innerText = fruitTypes[type];
+                obj1.style.left = xPos + 'px';
+                obj1.style.top = yOffset + 'px';
+                field1.appendChild(obj1);
+                objects.push({ element: obj1, x: xPos, y: yOffset, type: type, field: 1 });
+
+                // Баруун талбар
+                const obj2 = document.createElement('div');
+                obj2.classList.add('falling-object');
+                obj2.innerText = fruitTypes[type];
+                obj2.style.left = xPos + 'px';
+                obj2.style.top = yOffset + 'px';
+                field2.appendChild(obj2);
+                objects.push({ element: obj2, x: xPos, y: yOffset, type: type, field: 2 });
+            }
         }
 
         function updateGame() {
@@ -353,22 +362,22 @@
             moveBaskets();
 
             let topScore = Math.max(p1Score, p2Score);
-            currentSpeed = baseSpeed + Math.floor(topScore / 5);
-            speedDisplay.innerText = Math.floor(topScore / 5) + 1;
+            currentSpeed = baseSpeed + Math.floor(topScore / 7); // Олон жимстэй тул хурд нэмэгдэлтийг арай зөөлрүүлэв
+            speedDisplay.innerText = Math.floor(topScore / 7) + 1;
 
             for (let i = objects.length - 1; i >= 0; i--) {
                 let obj = objects[i];
                 obj.y += currentSpeed;
                 obj.element.style.top = obj.y + 'px';
 
-                if (obj.y >= 590 && obj.y <= 610) {
-                    if (obj.field === 1 && obj.x + 26 >= basket1X && obj.x <= basket1X + basket1Width) {
+                if (obj.y >= 585 && obj.y <= 610) {
+                    if (obj.field === 1 && obj.x + 35 >= basket1X && obj.x <= basket1X + basket1Width) {
                         handleCatch(1, obj.type);
                         obj.element.remove();
                         objects.splice(i, 1);
                         continue;
                     }
-                    if (obj.field === 2 && obj.x + 26 >= basket2X && obj.x <= basket2X + basket2Width) {
+                    if (obj.field === 2 && obj.x + 35 >= basket2X && obj.x <= basket2X + basket2Width) {
                         handleCatch(2, obj.type);
                         obj.element.remove();
                         objects.splice(i, 1);
@@ -385,52 +394,52 @@
 
         function handleCatch(playerNum, type) {
             if (playerNum === 1) {
-                if (type === 'fruit-red') p1Score += 1;
-                else if (type === 'fruit-yellow') p1Score += 3;
-                else if (type === 'fruit-blue') {
+                if (type === 'apple') p1Score += 1;
+                else if (type === 'banana') p1Score += 3;
+                else if (type === 'grapes') {
                     basket1Width = largeBasketWidth;
                     basket1.style.width = basket1Width + 'px';
-                    basket1.style.background = '#2e86de';
+                    basket1.style.background = 'linear-gradient(90deg, #a55eea, #8854d0)';
                     clearTimeout(p1PowerupTimeout);
                     p1PowerupTimeout = setTimeout(() => {
                         basket1Width = baseBasketWidth;
                         basket1.style.width = basket1Width + 'px';
-                        basket1.style.background = '#00ff88';
+                        basket1.style.background = 'linear-gradient(90deg, #00ff88, #00b358)';
                     }, 5000);
-                } else if (type === 'fruit-orange') {
+                } else if (type === 'orange') {
                     shootBombs(1);
                 } else if (type === 'bomb') {
                     if (basket1Width === largeBasketWidth) {
                         clearTimeout(p1PowerupTimeout);
                         basket1Width = baseBasketWidth;
                         basket1.style.width = basket1Width + 'px';
-                        basket1.style.background = '#00ff88';
+                        basket1.style.background = 'linear-gradient(90deg, #00ff88, #00b358)';
                     } else {
                         endGame(p2Name, `${p1Name} бөмбөгөнд дэлбэрлээ! 💥`);
                     }
                 }
                 p1ScoreDisplay.innerText = p1Score;
             } else {
-                if (type === 'fruit-red') p2Score += 1;
-                else if (type === 'fruit-yellow') p2Score += 3;
-                else if (type === 'fruit-blue') {
+                if (type === 'apple') p2Score += 1;
+                else if (type === 'banana') p2Score += 3;
+                else if (type === 'grapes') {
                     basket2Width = largeBasketWidth;
                     basket2.style.width = basket2Width + 'px';
-                    basket2.style.background = '#2e86de';
+                    basket2.style.background = 'linear-gradient(90deg, #a55eea, #8854d0)';
                     clearTimeout(p2PowerupTimeout);
                     p2PowerupTimeout = setTimeout(() => {
                         basket2Width = baseBasketWidth;
                         basket2.style.width = basket2Width + 'px';
-                        basket2.style.background = '#00d2ff';
+                        basket2.style.background = 'linear-gradient(90deg, #00d2ff, #0086b3)';
                     }, 5000);
-                } else if (type === 'fruit-orange') {
+                } else if (type === 'orange') {
                     shootBombs(2);
                 } else if (type === 'bomb') {
                     if (basket2Width === largeBasketWidth) {
                         clearTimeout(p2PowerupTimeout);
                         basket2Width = baseBasketWidth;
                         basket2.style.width = basket2Width + 'px';
-                        basket2.style.background = '#00d2ff';
+                        basket2.style.background = 'linear-gradient(90deg, #00d2ff, #0086b3)';
                     } else {
                         endGame(p1Name, `${p2Name} бөмбөгөнд дэлбэрлээ! 💥`);
                     }
@@ -506,8 +515,8 @@
             basket2Width = baseBasketWidth;
             basket1.style.width = basket1Width + 'px';
             basket2.style.width = basket2Width + 'px';
-            basket1.style.background = '#00ff88';
-            basket2.style.background = '#00d2ff';
+            basket1.style.background = 'linear-gradient(90deg, #00ff88, #00b358)';
+            basket2.style.background = 'linear-gradient(90deg, #00d2ff, #0086b3)';
             isGameOver = false;
 
             p1ScoreDisplay.innerText = 0;
@@ -516,7 +525,8 @@
             gameOverScreen.style.display = 'none';
 
             gameInterval = setInterval(updateGame, 1000 / 60);
-            spawnInterval = setInterval(spawnManager, 600);
+            // ШИНЭЧЛЭГДСЭН: Жимс унах давтамжийг 350ms болгож маш хурдан болгов
+            spawnInterval = setInterval(spawnManager, 350); 
         }
     </script>
 </body>
