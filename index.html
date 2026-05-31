@@ -79,8 +79,6 @@
             width: 26px;
             height: 26px;
             border-radius: 50%;
-            transform: scale(1);
-            transition: transform 0.1s;
         }
 
         .fruit-red { background: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); }
@@ -93,7 +91,7 @@
             box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
         }
 
-        /* UI Хэсэг (Шилэн эффекттэй) */
+        /* UI Хэсэг */
         .ui-panel {
             position: absolute;
             top: 20px;
@@ -132,14 +130,14 @@
             text-transform: uppercase;
         }
 
-        /* Нааж харуулах дэлгэцнүүд (Overlay) */
+        /* Overlay Дэлгэцүүд */
         .overlay-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 14, 23, 0.92);
+            background: rgba(10, 14, 23, 0.94);
             backdrop-filter: blur(15px);
             color: white;
             display: flex;
@@ -147,16 +145,13 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
-            animation: fadeIn 0.4s ease-out;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .overlay-screen h1 {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+            letter-spacing: 3px;
+            margin-bottom: 35px;
             text-align: center;
             background: linear-gradient(45deg, #00d2ff, #00ff88);
             -webkit-background-clip: text;
@@ -168,22 +163,22 @@
         .input-box { display: flex; flex-direction: column; align-items: center; }
         .input-box label { font-size: 13px; color: #8af; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .input-box input {
-            padding: 12px 20px; font-size: 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 14px 20px; font-size: 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
             background: rgba(255,255,255,0.05); color: white; text-align: center; width: 180px;
             transition: all 0.3s;
         }
         .input-box input:focus { border-color: var(--p2-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); outline: none; }
 
-        /* Орчин үеийн товчлуур */
+        /* Товчлуур */
         .btn {
-            padding: 14px 40px; font-size: 16px; background: linear-gradient(135deg, #00d2ff 0%, #00ff88 100%);
+            padding: 14px 45px; font-size: 16px; background: linear-gradient(135deg, #00d2ff 0%, #00ff88 100%);
             color: #0a0e17; border: none; border-radius: 12px; cursor: pointer; font-weight: 700;
             letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.4); }
         .btn:active { transform: translateY(-1px); }
 
-        /* Дээд амжилтын хүснэгт */
+        /* Дээд амжилт */
         .leaderboard {
             margin-top: 30px; width: 340px; background: rgba(255,255,255,0.02);
             padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
@@ -201,16 +196,19 @@
     <div id="game-screen">
         <div id="speed-display">Level: <span id="speed-level">1</span></div>
 
+        <!-- ЗҮҮН ТАЛБАР -->
         <div class="field field-p1" id="field-p1">
             <div class="ui-panel"><span id="p1-name-tag" class="p1-text">P1</span>: <span id="p1-score">0</span></div>
             <div id="basket1" class="basket"></div>
         </div>
 
+        <!-- БАРУУН ТАЛБАР -->
         <div class="field field-p2" id="field-p2">
             <div class="ui-panel ui-right"><span id="p2-name-tag" class="p2-text">P2</span>: <span id="p2-score">0</span></div>
             <div id="basket2" class="basket"></div>
         </div>
 
+        <!-- 1. НЭР ОРУУЛАХ ЦОНХ -->
         <div id="start-screen" class="overlay-screen">
             <h1>FRUIT BATTLE</h1>
             <div class="input-group">
@@ -226,6 +224,7 @@
             <button class="btn" onclick="startGame()">Start Game</button>
         </div>
 
+        <!-- 2. GAME OVER ЦОНХ -->
         <div id="game-over-screen" class="overlay-screen" style="display: none;">
             <div id="winnerText">WINNER</div>
             <div id="reasonText">Reason</div>
@@ -362,16 +361,13 @@
                 obj.y += currentSpeed;
                 obj.element.style.top = obj.y + 'px';
 
-                // Сагсны мөргөлдөөн шалгах (Y байрлал: 650 - 30px зай - 14px өндөр = 606px)
                 if (obj.y >= 590 && obj.y <= 610) {
-                    // Тоглогч 1 шалгах
                     if (obj.field === 1 && obj.x + 26 >= basket1X && obj.x <= basket1X + basket1Width) {
                         handleCatch(1, obj.type);
                         obj.element.remove();
                         objects.splice(i, 1);
                         continue;
                     }
-                    // ТӨГЛӨГЧ 2 ШАЛГАХ (ЭНД БАЙСАН АЛДААГ ЗАССАН)
                     if (obj.field === 2 && obj.x + 26 >= basket2X && obj.x <= basket2X + basket2Width) {
                         handleCatch(2, obj.type);
                         obj.element.remove();
@@ -394,12 +390,12 @@
                 else if (type === 'fruit-blue') {
                     basket1Width = largeBasketWidth;
                     basket1.style.width = basket1Width + 'px';
-                    basket1.style.background = '#3498db';
+                    basket1.style.background = '#2e86de';
                     clearTimeout(p1PowerupTimeout);
                     p1PowerupTimeout = setTimeout(() => {
                         basket1Width = baseBasketWidth;
                         basket1.style.width = basket1Width + 'px';
-                        basket1.style.background = var(--p1-color);
+                        basket1.style.background = '#00ff88';
                     }, 5000);
                 } else if (type === 'fruit-orange') {
                     shootBombs(1);
@@ -408,22 +404,24 @@
                         clearTimeout(p1PowerupTimeout);
                         basket1Width = baseBasketWidth;
                         basket1.style.width = basket1Width + 'px';
+                        basket1.style.background = '#00ff88';
                     } else {
                         endGame(p2Name, `${p1Name} бөмбөгөнд дэлбэрлээ! 💥`);
                     }
                 }
                 p1ScoreDisplay.innerText = p1Score;
             } else {
-                // Тоглогч 2-ын логик яг таг ажиллана
                 if (type === 'fruit-red') p2Score += 1;
                 else if (type === 'fruit-yellow') p2Score += 3;
                 else if (type === 'fruit-blue') {
                     basket2Width = largeBasketWidth;
                     basket2.style.width = basket2Width + 'px';
+                    basket2.style.background = '#2e86de';
                     clearTimeout(p2PowerupTimeout);
                     p2PowerupTimeout = setTimeout(() => {
                         basket2Width = baseBasketWidth;
                         basket2.style.width = basket2Width + 'px';
+                        basket2.style.background = '#00d2ff';
                     }, 5000);
                 } else if (type === 'fruit-orange') {
                     shootBombs(2);
@@ -432,6 +430,7 @@
                         clearTimeout(p2PowerupTimeout);
                         basket2Width = baseBasketWidth;
                         basket2.style.width = basket2Width + 'px';
+                        basket2.style.background = '#00d2ff';
                     } else {
                         endGame(p1Name, `${p2Name} бөмбөгөнд дэлбэрлээ! 💥`);
                     }
@@ -507,6 +506,8 @@
             basket2Width = baseBasketWidth;
             basket1.style.width = basket1Width + 'px';
             basket2.style.width = basket2Width + 'px';
+            basket1.style.background = '#00ff88';
+            basket2.style.background = '#00d2ff';
             isGameOver = false;
 
             p1ScoreDisplay.innerText = 0;
