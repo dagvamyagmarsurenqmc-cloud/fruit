@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2 Тоглогчтой Тусдаа Талбар</title>
+    <title>2 Тоглогчтой Тэгш Тэмцэл</title>
     <style>
         body {
             margin: 0;
@@ -43,7 +43,7 @@
             position: relative;
         }
 
-        /* Тоглогч 1-ийн Сагс (A/D) */
+        /* Сагснууд */
         #basket1 {
             position: absolute;
             bottom: 20px;
@@ -55,7 +55,6 @@
             box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
         }
 
-        /* Тоглогч 2-ийн Сагс (Сумнууд) */
         #basket2 {
             position: absolute;
             bottom: 20px;
@@ -75,24 +74,11 @@
             border-radius: 50%;
         }
 
-        .fruit-red {
-            background: #ff4757;
-            box-shadow: inset -4px -4px 6px rgba(0,0,0,0.4);
-        }
+        .fruit-red { background: #ff4757; box-shadow: inset -4px -4px 6px rgba(0,0,0,0.4); }
+        .fruit-gold { background: #ffa502; border: 1px solid #fff; box-shadow: 0 0 10px #ffa502, inset -4px -4px 6px rgba(0,0,0,0.3); }
+        .bomb { background: #2f3542; border: 2px solid #000; box-shadow: inset -4px -4px 6px rgba(255,255,255,0.2); }
 
-        .fruit-gold {
-            background: #ffa502;
-            border: 1px solid #fff;
-            box-shadow: 0 0 10px #ffa502, inset -4px -4px 6px rgba(0,0,0,0.3);
-        }
-
-        .bomb {
-            background: #2f3542;
-            border: 2px solid #000;
-            box-shadow: inset -4px -4px 6px rgba(255,255,255,0.2);
-        }
-
-        /* Дээд талын UI мэдээлэл */
+        /* Дээд талын UI */
         .ui-panel {
             position: absolute;
             top: 15px;
@@ -103,12 +89,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             z-index: 5;
         }
-        
-        .ui-right {
-            left: auto;
-            right: 20px;
-            text-align: right;
-        }
+        .ui-right { left: auto; right: 20px; text-align: right; }
 
         #speed-display {
             position: absolute;
@@ -124,43 +105,50 @@
             border-radius: 20px;
         }
 
-        /* Game Over дэлгэц */
-        #game-over-screen {
-            display: none;
+        /* Бүх цонхны үндсэн загвар (Нэвтрэх, Game Over) */
+        .overlay-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(15, 15, 26, 0.95);
             color: white;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
         }
 
-        #winnerText {
-            font-size: 42px;
-            font-weight: bold;
-            color: #f1c40f;
-            margin-bottom: 10px;
-        }
-
-        #reasonText {
-            font-size: 18px;
-            color: #bdc3c7;
+        .overlay-screen h1 { color: #f1c40f; font-size: 38px; margin-bottom: 20px; text-align: center; }
+        
+        /* Input загвар */
+        .input-group {
+            display: flex;
+            gap: 20px;
             margin-bottom: 30px;
         }
-
-        .final-scores {
+        .input-box {
             display: flex;
-            gap: 60px;
-            font-size: 24px;
-            margin-bottom: 35px;
+            flex-direction: column;
+            align-items: center;
         }
+        .input-box label { font-size: 14px; color: #bbb; margin-bottom: 5px; }
+        .input-box input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+            text-align: center;
+            width: 180px;
+        }
+        .input-box input:focus { border-color: #2ecc71; outline: none; }
 
-        #restart-btn {
+        /* Товчлуур */
+        .btn {
             padding: 12px 35px;
             font-size: 18px;
             background: #2ecc71;
@@ -171,36 +159,83 @@
             font-weight: bold;
             transition: 0.2s;
         }
+        .btn:hover { transform: scale(1.05); background: #27ae60; }
 
-        #restart-btn:hover {
-            background: #27ae60;
-            transform: scale(1.05);
+        /* Дээд амжилтын хүснэгт */
+        .leaderboard {
+            margin-top: 25px;
+            width: 320px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
         }
+        .leaderboard h3 { margin: 0 0 10px 0; text-align: center; color: #00adb5; font-size: 18px; }
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
+            font-size: 15px;
+        }
+
+        #reasonText { font-size: 18px; color: #bdc3c7; margin-bottom: 20px; }
+        .final-scores { display: flex; gap: 60px; font-size: 24px; margin-bottom: 25px; }
     </style>
 </head>
 <body>
 
     <div id="game-screen">
+        <!-- Түвшин -->
         <div id="speed-display">Түвшин: <span id="speed-level">1</span></div>
 
+        <!-- ЗҮҮН ТАЛБАР (Player 1) -->
         <div class="field-p1" id="field-p1">
-            <div class="ui-panel">Тоглогч 1 (A/D): <span id="p1-score">0</span></div>
+            <div class="ui-panel"><span id="p1-name-tag">P1</span>: <span id="p1-score">0</span></div>
             <div id="basket1"></div>
         </div>
 
+        <!-- БАРУУН ТАЛБАР (Player 2) -->
         <div class="field-p2" id="field-p2">
-            <div class="ui-panel ui-right">Тоглогч 2 (◀/▶): <span id="p2-score">0</span></div>
+            <div class="ui-panel ui-right"><span id="p2-name-tag">P2</span>: <span id="p2-score">0</span></div>
             <div id="basket2"></div>
         </div>
 
-        <div id="game-over-screen">
-            <div id="winnerText">ТОГЛООМ ДУУСЛАА</div>
-            <div id="reasonText">Шалтгаан</div>
-            <div class="final-scores">
-                <div style="color: #2ecc71;">P1 Оноо: <span id="p1-final">0</span></div>
-                <div style="color: #00adb5;">P2 Оноо: <span id="p2-final">0</span></div>
+        <!-- 1. НЭР ОРУУЛАХ ЦОНХ -->
+        <div id="start-screen" class="overlay-screen">
+            <h1>ЖИМСНИЙ ТЭМЦЭЛ</h1>
+            <div class="input-group">
+                <div class="input-box">
+                    <label>Тоглогч 1 (A/D)</label>
+                    <input type="text" id="p1-input" value="Тоглогч 1" maxlength="10">
+                </div>
+                <div class="input-box">
+                    <label>Тоглогч 2 (◀/▶)</label>
+                    <input type="text" id="p2-input" value="Тоглогч 2" maxlength="10">
+                </div>
             </div>
-            <button id="restart-btn" onclick="resetGame()">Дахин тоглох</button>
+            <button class="btn" onclick="startGame()">Тоглоомыг Эхлүүлэх</button>
+        </div>
+
+        <!-- 2. GAME OVER ЦОНХ -->
+        <div id="game-over-screen" class="overlay-screen" style="display: none;">
+            <h1 id="winnerText">ЯЛАГЧ</h1>
+            <div id="reasonText">Шалтгаан</div>
+            
+            <div class="final-scores">
+                <div style="color: #2ecc71;"><span id="p1-lbl">P1</span>: <span id="p1-final">0</span></div>
+                <div style="color: #00adb5;"><span id="p2-lbl">P2</span>: <span id="p2-final">0</span></div>
+            </div>
+
+            <button class="btn" onclick="resetGame()">Дахин тоглох</button>
+
+            <!-- Дээд амжилтын самбар -->
+            <div class="leaderboard">
+                <h3>🏆 Шилдэг Амжилтууд</h3>
+                <div id="leaderboard-content">
+                    <!-- Энд оноонууд хадгалагдаж харагдана -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -210,16 +245,16 @@
         const basket1 = document.getElementById('basket1');
         const basket2 = document.getElementById('basket2');
         
+        // UI элементүүд
         const p1ScoreDisplay = document.getElementById('p1-score');
         const p2ScoreDisplay = document.getElementById('p2-score');
         const speedDisplay = document.getElementById('speed-level');
+        const startScreen = document.getElementById('start-screen');
         const gameOverScreen = document.getElementById('game-over-screen');
-        const winnerText = document.getElementById('winnerText');
-        const reasonText = document.getElementById('reasonText');
-        const p1Final = document.getElementById('p1-final');
-        const p2Final = document.getElementById('p2-final');
+        
+        let p1Name = "Тоглогч 1";
+        let p2Name = "Тоглогч 2";
 
-        // Тоглоомын хэмжээ (Нэг талбар нь 500px өргөн)
         const fieldWidth = 500;
         const basketWidth = 90;
         const basketSpeed = 12;
@@ -229,19 +264,15 @@
         let baseSpeed = 3.5;
         let currentSpeed = 3.5;
         
-        let basket1X = 200; // Талбар доторх X байрлал (0-оос 410)
+        let basket1X = 200;
         let basket2X = 200;
         
-        let objects = []; // { element, x, y, type, field: 1 эсвэл 2 }
+        let objects = []; 
         let gameInterval;
         let spawnInterval;
         let isGameOver = false;
 
-        // Товчлуур хянах
-        let keys = {
-            a: false, d: false,
-            ArrowLeft: false, ArrowRight: false
-        };
+        let keys = { a: false, d: false, ArrowLeft: false, ArrowRight: false };
 
         document.addEventListener('keydown', (e) => {
             let key = e.key;
@@ -257,7 +288,6 @@
             if (key in keys) keys[key] = false;
         });
 
-        // Сагсны хөдөлгөөн (Талбараасаа гарахгүй)
         function moveBaskets() {
             if (keys.a && basket1X > 0) basket1X -= basketSpeed;
             if (keys.d && basket1X < fieldWidth - basketWidth) basket1X += basketSpeed;
@@ -268,49 +298,54 @@
             basket2.style.left = basket2X + 'px';
         }
 
-        // Аль нэг талбарт объект үүсгэх функц
-        function spawnObjectForField(fieldNum, targetFieldElement) {
+        // Нэр хадгалж тоглоомыг анх удаа эхлүүлэх
+        function startGame() {
+            p1Name = document.getElementById('p1-input').value.trim() || "Тоглогч 1";
+            p2Name = document.getElementById('p2-input').value.trim() || "Тоглогч 2";
+            
+            document.getElementById('p1-name-tag').innerText = p1Name;
+            document.getElementById('p2-name-tag').innerText = p2Name;
+            
+            startScreen.style.display = 'none';
+            resetGame();
+        }
+
+        // ХОЁР ТАЛБАРТ ЯГ ИЖИЛХЭН ОБЪЕКТ ҮҮСГЭХ
+        function spawnManager() {
             if (isGameOver) return;
 
-            const obj = document.createElement('div');
-            obj.classList.add('falling-object');
-
+            // 1. Яг адилхан төрлийг сонгоно
             const rand = Math.random();
             let type = 'fruit-red';
+            if (rand < 0.50) type = 'fruit-red';
+            else if (rand < 0.72) type = 'fruit-gold';
+            else type = 'bomb';
 
-            if (rand < 0.50) {
-                type = 'fruit-red';    // 50% Улаан жимс (+1)
-                obj.classList.add('fruit-red');
-            } else if (rand < 0.72) {
-                type = 'fruit-gold';   // 22% Алтан жимс (+3)
-                obj.classList.add('fruit-gold');
-            } else {
-                type = 'bomb';         // 28% Бөмбөг (Аюултай)
-                obj.classList.add('bomb');
-            }
-
-            // Талбарын өргөн доторх санамсаргүй байрлал
+            // 2. Яг адилхан X байрлалыг (баруун, зүүн талбарт) сонгоно
             const xPos = Math.floor(Math.random() * (fieldWidth - 30));
-            obj.style.left = xPos + 'px';
-            obj.style.top = '0px';
 
-            targetFieldElement.appendChild(obj);
-            objects.push({ element: obj, x: xPos, y: 0, type: type, field: fieldNum });
+            // Зүүн талбарт объект үүсгэх
+            const obj1 = document.createElement('div');
+            obj1.classList.add('falling-object', type);
+            obj1.style.left = xPos + 'px';
+            obj1.style.top = '0px';
+            field1.appendChild(obj1);
+            objects.push({ element: obj1, x: xPos, y: 0, type: type, field: 1 });
+
+            // Баруун талбарт яг ижил байрлалд объект үүсгэх
+            const obj2 = document.createElement('div');
+            obj2.classList.add('falling-object', type);
+            obj2.style.left = xPos + 'px';
+            obj2.style.top = '0px';
+            field2.appendChild(obj2);
+            objects.push({ element: obj2, x: xPos, y: 0, type: type, field: 2 });
         }
 
-        // Хоёр талбарт зэрэг унагах дуудагч
-        function spawnManager() {
-            spawnObjectForField(1, field1); // Зүүн талбарт унана
-            spawnObjectForField(2, field2); // Баруун талбарт унана
-        }
-
-        // Тоглоомыг шинэчлэх үндсэн давталт
         function updateGame() {
             if (isGameOver) return;
 
             moveBaskets();
 
-            // Хамгийн өндөр оноотой тоглогчоор нь бодож хурдыг нэмнэ
             let topScore = Math.max(p1Score, p2Score);
             currentSpeed = baseSpeed + Math.floor(topScore / 5);
             speedDisplay.innerText = Math.floor(topScore / 5) + 1;
@@ -320,18 +355,13 @@
                 obj.y += currentSpeed;
                 obj.element.style.top = obj.y + 'px';
 
-                // Мөргөлдөөн шалгах Y байрлал (650 - 20 - 20 = 610px)
                 if (obj.y >= 595 && obj.y <= 615) {
-                    
-                    // Зүүн талын тоглогч өөрийн жимсийг авсан эсэх
                     if (obj.field === 1 && obj.x + 30 >= basket1X && obj.x <= basket1X + basketWidth) {
                         handleCatch(1, obj.type);
                         obj.element.remove();
                         objects.splice(i, 1);
                         continue;
                     }
-                    
-                    // Баруун талын тоглогч өөрийн жимсийг авсан эсэх
                     if (obj.field === 2 && obj.x + 30 >= basket2X && obj.x <= basket2X + basketWidth) {
                         handleCatch(2, obj.type);
                         obj.element.remove();
@@ -340,7 +370,6 @@
                     }
                 }
 
-                // Доошоо гарвал устгах
                 if (obj.y > 650) {
                     obj.element.remove();
                     objects.splice(i, 1);
@@ -348,15 +377,13 @@
             }
         }
 
-        // Жимс барих логик
         function handleCatch(playerNum, type) {
             if (type === 'bomb') {
-                let winner = (playerNum === 1) ? 'Тоглогч 2 (Цэнхэр)' : 'Тоглогч 1 (Ногоон)';
-                let loser = (playerNum === 1) ? 'Тоглогч 1' : 'Тоглогч 2';
+                let winner = (playerNum === 1) ? p2Name : p1Name;
+                let loser = (playerNum === 1) ? p1Name : p2Name;
                 endGame(winner, `${loser} бөмбөгөнд дэлбэрлээ! 💥`);
             } else {
                 let points = (type === 'fruit-gold') ? 3 : 1;
-                
                 if (playerNum === 1) {
                     p1Score += points;
                     p1ScoreDisplay.innerText = p1Score;
@@ -367,16 +394,60 @@
             }
         }
 
+        // Оноо хадгалах функц
+        function saveScores() {
+            // Хуучин оноонуудыг LocalStorage-оос авах
+            let scores = JSON.parse(localStorage.getItem('fruitGameScores')) || [];
+            
+            // Энэ удаагийн тоглогчдын оноог нэмэх
+            scores.push({ name: p1Name, score: p1Score });
+            scores.push({ name: p2Name, score: p2Score });
+            
+            // Оноогоор нь жагсааж (Ихээс бага руу), шилдэг 5-ыг үлдээх
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 5);
+            
+            // Буцааж хадгалах
+            localStorage.setItem('fruitGameScores', JSON.stringify(scores));
+            
+            // Самбарыг шинэчлэх
+            displayLeaderboard();
+        }
+
+        // Амжилтын самбар дэлгэцэнд харуулах
+        function displayLeaderboard() {
+            let scores = JSON.parse(localStorage.getItem('fruitGameScores')) || [];
+            const container = document.getElementById('leaderboard-content');
+            container.innerHTML = '';
+            
+            if (scores.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#777;">Амжилт хараахан байхгүй</div>';
+                return;
+            }
+
+            scores.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="score-row">
+                        <span>${index + 1}. ${item.name}</span>
+                        <span style="color:#f1c40f; font-weight:bold;">${item.score} онoo</span>
+                    </div>`;
+            });
+        }
+
         function endGame(winner, reason) {
             isGameOver = true;
             clearInterval(gameInterval);
             clearInterval(spawnInterval);
             
-            winnerText.innerText = `ЯЛАГЧ: ${winner} 🎉`;
-            reasonText.innerText = reason;
-            p1Final.innerText = p1Score;
-            p2Final.innerText = p2Score;
+            document.getElementById('winnerText').innerText = `ЯЛАГЧ: ${winner} 🎉`;
+            document.getElementById('reasonText').innerText = reason;
             
+            document.getElementById('p1-lbl').innerText = p1Name;
+            document.getElementById('p2-lbl').innerText = p2Name;
+            document.getElementById('p1-final').innerText = p1Score;
+            document.getElementById('p2-final').innerText = p2Score;
+            
+            saveScores(); // Оноог хадгална
             gameOverScreen.style.display = 'flex';
         }
 
@@ -396,10 +467,8 @@
             gameOverScreen.style.display = 'none';
 
             gameInterval = setInterval(updateGame, 1000 / 60);
-            spawnInterval = setInterval(spawnManager, 600); // 0.6 сек тутамд талбар бүрт зүйлс зэрэг унана
+            spawnInterval = setInterval(spawnManager, 600); // 0.6 сек тутамд унана
         }
-
-        resetGame();
     </script>
 </body>
 </html>
